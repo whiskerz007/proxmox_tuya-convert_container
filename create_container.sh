@@ -70,8 +70,6 @@ done
 unset RESULT
 echo -e "\nUsing $WLAN..."
 
-#trap '{ echo -e "\n\nERROR: Failed to properly configure container.\nEXIT: $?\n"; exit 1; }' ERR
-
 # Get the next guest VM/LXC ID
 CTID=$(cat<<EOF | python3
 import json
@@ -115,7 +113,6 @@ lxc.net.1.flags: up
 EOF
 
 # Setup container for tuya-convert
-#trap '{ echo -e "\n\nERROR: Failed to properly configure container.\nEXIT: $?\n"; pct stop $CTID; pct destroy $CTID; exit 1; }' ERR
 pct start $CTID
 pct push $CTID install_tuya-convert.sh /root/install_tuya-convert.sh -perms 755
 pct push $CTID login.sh /root/login.sh -perms 755
