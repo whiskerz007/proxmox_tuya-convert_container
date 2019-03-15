@@ -28,7 +28,8 @@ wget -q https://raw.githubusercontent.com/whiskerz007/proxmox_tuya-convert_conta
 
 # Check for dependencies
 IW=`apt-cache policy iw | sed -n 's/^\s*Installed: \(.*$\)/\1/p'`
-if [ "$IW" = "(none)" ]; then  apt update && apt install -y iw ||
+if [ "$IW" = "(none)" ]; then
+  apt update && apt install -y iw ||
     die "Unable to install prerequisites."
 fi
 
