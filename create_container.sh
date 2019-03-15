@@ -96,7 +96,7 @@ TEMPLATE="local:vztmpl/${DEBIAN}"
 
 # Create LXC and add WLAN interface
 if [ "$STORAGE_TYPE" = "dir" ]; then
-    DISK_EXT=".qcow2"
+    DISK_EXT=".raw"
     DISK_REF="$CTID/"
 fi
 DISK=vm-${CTID}-disk-0${DISK_EXT}
