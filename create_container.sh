@@ -36,7 +36,7 @@ fi
 
 # Verify valid storage location
 LXC_STORAGE=${1:-local-lvm}
-pvesm list $LXC_STORAGE >& /dev/null ||
+pvesm list $LXC_STORAGE >&/dev/null ||
   die "'$LXC_STORAGE' is not a valid storage ID.\n\n\n" 
 pvesm status -content images -storage $LXC_STORAGE >&/dev/null ||
   die "'$LXC_STORAGE' does not allow 'Disk image' to be stored."
@@ -46,7 +46,7 @@ STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
 trap - ERR
 mapfile -t WLANS < <(ip link show | sed -n "s/.*\(wl.*\)\:.*/\1/p")
 for i in "${WLANS[@]}"; do
-  ip link set dev $i up >& /dev/null
+  ip link set dev $i up >&/dev/null
   RESULT=$?
   if [ $RESULT -eq 0 ]; then
     WLANS_READY+=($i)
