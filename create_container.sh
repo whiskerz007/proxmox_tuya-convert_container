@@ -67,7 +67,6 @@ while true; do
     break
   fi
 done
-unset RESULT
 echo -e "\nUsing $WLAN..."
 
 # Get the next guest VM/LXC ID
