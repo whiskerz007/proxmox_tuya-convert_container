@@ -17,7 +17,6 @@ done
 
 
 # Set parameters for OS
-echo -e "tuya\ntuya" | passwd
 sed -i "s/\(# \)\($LOCALE.*\)/\2/" /etc/locale.gen
 export LANGUAGE=$LOCALE LANG=$LOCALE LC_ALL=$LOCALE
 locale-gen
