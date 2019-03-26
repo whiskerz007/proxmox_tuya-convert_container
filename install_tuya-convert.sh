@@ -43,13 +43,13 @@ cat <<EOL >> /etc/samba/smb.conf
   force user = root
 EOL
 echo -e \
-  "*****************************\n" \
-  " The tuya-convert files are\n" \
-  " shared using samba at\n" \
+ " *****************************\n"\
+  " The tuya-convert files are\n"\
+  " shared using samba at\n"\
   " \4{eth0}\n"\
-  "*****************************\n\n" \
-  "Login using the following credentials\n" \
-  " username: root\n" \
+  "*****************************\n\n"\
+  "Login using the following credentials\n"\
+  " username: root\n"\
   " password: tuya\n\n" >> /etc/issue
 sed -i "s/^\(root\)\(.*\)\(\/bin\/bash\)$/\1\2\/root\/login.sh/" /etc/passwd
 
