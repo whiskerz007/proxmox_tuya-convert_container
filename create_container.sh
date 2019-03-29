@@ -104,7 +104,7 @@ pvesm alloc $LXC_STORAGE $CTID $DISK 2G
 mke2fs $DISK_PATH
 pct create $CTID $TEMPLATE -arch amd64 -cores 1 -hostname tuya-convert \
     -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype debian \
-    -password tuya -rootfs $ROOTFS -storage $LXC_STORAGE
+    -rootfs $ROOTFS -storage $LXC_STORAGE
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
 lxc.net.1.type: phys
 lxc.net.1.name: ${WLAN}
