@@ -3,6 +3,7 @@
 trap "{ echo -e '\nTerminate'; ./stop_flash.sh; exit 1; }" SIGINT SIGTERM
 
 cd /root/tuya-convert/
+git fetch origin >/dev/null
 mapfile -t REF < <(git show-ref master | sed -e 's/^\(.*\)\(\s.*$\)/\1/')
 if [ "${REF[0]}" != "${REF[1]}" ]; then
   echo -e "\n\n"\
