@@ -43,17 +43,24 @@ pvesm status -content images -storage $LXC_STORAGE >&/dev/null ||
 STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
 
 # Get WLAN interfaces capable of being passed to LXC
-trap - ERR
-mapfile -t WLANS < <(ip link show | sed -n "s/.*\(wl.*\)\:.*/\1/p")
-for i in "${WLANS[@]}"; do
-  ip link set dev $i up >&/dev/null
-  RESULT=$?
-  if [ $RESULT -eq 0 ]; then
-    WLANS_READY+=($i)
+FAILED_SUPPORT=false
+mapfile -t WLANS < <(iw dev | sed -n 's/phy#\([0-9]\)*/\1/p; s/[[:space:]]Interface \(.*\)/\1/p')
+for i in $(seq 0 2 $((${#WLANS[@]}-1)));do
+  FEATURES=( $(iw phy${WLANS[i]} info | sed -n '/\bSupported interface modes:/,/\bBand/{/Supported/d;/Band/d;s/\( \)*\* //;p;}') )
+  SUPPORTED=false
+  for feature in "${FEATURES[@]}"; do
+    if [ "AP" == $feature ]; then
+      SUPPORTED=true
+      WLANS_READY+=(${WLANS[i+1]})
+    fi
+  done
+  if ! $SUPPORTED; then
+    FAILED_SUPPORT=true
   fi
 done
-trap die ERR
-if [ ${#WLANS_READY[@]} -eq 0 ]; then
+if [ ${#WLANS_READY[@]} -eq 0 ] && $FAILED_SUPPORT; then
+  die "One or more of the detected WiFi adapters do not support 'AP mode'. Try another adapter."
+elif [ ${#WLANS_READY[@]} -eq 0 ]; then
   die "Unable to identify usable WiFi adapters. If the adapter is currently attached, check your drivers."
 fi
 while true; do
