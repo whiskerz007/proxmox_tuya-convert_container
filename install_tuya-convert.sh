@@ -37,7 +37,7 @@ sed -i "s/^\(WLAN=\)\(.*\)/\1$WLAN/" config.txt
 # Customize OS
 cat <<EOL >> /etc/samba/smb.conf
 [tuya-convert]
-  path = /root/tuya-convert2
+  path = /root/tuya-convert
   browseable = yes
   writable = yes
   public = yes
