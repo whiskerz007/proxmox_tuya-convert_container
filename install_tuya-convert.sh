@@ -26,7 +26,7 @@ locale-gen
 apt update
 apt upgrade -y
 apt install -y git curl net-tools samba
-git clone https://github.com/ct-Open-Source/tuya-convert
+git clone https://github.com/M4dmartig4n/tuya-convert/tree/master
 find tuya-convert -name \*.sh -exec sed -i -e "s/sudo -E//" -e "s/sudo //" {} \;
 cd tuya-convert
 ./install_prereq.sh
