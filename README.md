@@ -25,3 +25,15 @@ DigiblurDIY has provided the latest Tasmota BIN files with WiFiManager enabled h
 All you have to do is start your Tuya-Convert container, and drop the BIN file in the files folder using SAMBA bfore you start the conversion process. The script will index the folder contents for you.
 
 https://github.com/digiblur/Sonoff-Tasmota/tree/development/generic
+
+Tuya-Convert 1.0 Github (for Raspberry Pi 3/3B) or (Kali-Linux/Debian with proper dependancies already setup)
+
+https://github.com/ct-Open-Source/tuya-convert
+
+Tuya-Convert 2.0 Github (for Raspberry Pi 3/3B) or (Kali-Linux/Debian with proper dependancies already setup)
+
+https://github.com/M4dmartig4n/tuya-convert
+
+Thank you to everyone who made this possible!
+
+-SirRedZ
