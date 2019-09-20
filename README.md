@@ -26,6 +26,8 @@ All you have to do is start your Tuya-Convert container, and drop the BIN file i
 
 ## Sources
 
+DigiBlur's WIFIMANAGER (default) compiled Sonoff-Tasmota builds
+
 https://github.com/digiblur/Sonoff-Tasmota/tree/development/generic
 
 Tuya-Convert 1.0 Github (for Raspberry Pi 3/3B) or (Kali-Linux/Debian with proper dependancies already setup)
