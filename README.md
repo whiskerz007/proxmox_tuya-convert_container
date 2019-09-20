@@ -6,7 +6,7 @@ This process has been confirmed working by multiple others with various levels o
 To create a new LXC container in the `local-lvm` storage, run the following in a SSH session or the console from Proxmox interface
 
 ```
-bash -c "$(wget -qO - https://raw.githubusercontent.com/whiskerz007/proxmox_tuya-convert_container/master/create_container.sh)" -s local-lvm
+bash -c "$(wget -qO - https://raw.githubusercontent.com/sirredz/proxmox_tuya-convert_container/master/create_container.sh)" -s local-lvm
 ```
 
 During the setup process, you will prompted to select a wireless interface. This interface will be assigned to container. _(Note: When the container is running, no other container or VM will have access to the interface.)_ After the successful completion of the script, start the container identified by the script, then use the login credentials shown to start the tuya-convert script. If you need to stop tuya-convert, press `CTRL + C` and it will be halted and you will be brought back to the login prompt. If you login again it will start tuya-convert again.
