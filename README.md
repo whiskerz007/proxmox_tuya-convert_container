@@ -1,7 +1,7 @@
 # Proxmox tuya-convert v2.0 Container
 
 This script will create a Proxmox LXC container with the latest Debian and setup tuya-convert 2.0. This process is still experimental and very tempermental. Using brute-force, connecting and disconnection during the process, I have been successful with all devices EXCEPT light-bulbs.
-This process has been confirmed working by multipl others with various levels of interaction.
+This process has been confirmed working by multiple others with various levels of interaction.
 
 To create a new LXC container in the `local-lvm` storage, run the following in a SSH session or the console from Proxmox interface
 
