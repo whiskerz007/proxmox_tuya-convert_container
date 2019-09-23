@@ -106,9 +106,9 @@ fi
 DISK=vm-${CTID}-disk-0${DISK_EXT}
 ROOTFS=${LXC_STORAGE}:${DISK_REF}${DISK}
 DISK_PATH=`pvesm path $ROOTFS`
-pvesm alloc $LXC_STORAGE $CTID $DISK 6G
+pvesm alloc $LXC_STORAGE $CTID $DISK 2G
 mke2fs $DISK_PATH
-pct create $CTID $TEMPLATE -arch amd64 -cores 1 -hostname tuya-convert \
+pct create $CTID $TEMPLATE -arch amd64 -cores 1 -hostname tuya-convert2 \
     -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype debian \
     -rootfs $ROOTFS -storage $LXC_STORAGE
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
