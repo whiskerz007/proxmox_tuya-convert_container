@@ -24,16 +24,14 @@ function cleanup() {
 trap cleanup EXIT
 TMP=`mktemp -d`
 pushd $TMP >/dev/null
-wget -q https://raw.githubusercontent.com/SirRedZ/proxmox_tuya-convert_container/master/{install_tuya-convert,login}.sh
+wget -q https://raw.githubusercontent.com/whiskerz007/proxmox_tuya-convert_container/master/{install_tuya-convert,login}.sh
 
 # Check for dependencies
-which iw >/dev/null
-RESULT=$?
-if [ $RESULT -ne 0 ]; then
+which iw >/dev/null || (
   apt update
   apt install -y iw ||
     die "Unable to install prerequisites."
-fi
+)
 
 # Verify valid storage location
 LXC_STORAGE=${1:-local-lvm}
