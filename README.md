@@ -1,6 +1,6 @@
 # Proxmox Tuya-Convert v2.0 Container
 
-## Testing note: Many devices have been successfully flashed. Some devices are proving to be more difficult - currently light bulbs are challenging/hit & miss. This script will continue to be updated as new attempts are released. Check the date/time of the files to decide if you've tried the latest revision. This message will be removed once Tuya 2.0 is considered completed... Check daily as there is a lot of work happening on this topic ATM.
+#### Testing note: Many devices have been successfully flashed. Some devices are proving to be more difficult - currently light bulbs are challenging/hit & miss. This script will continue to be updated as new attempts are released. Check the date/time of the files to decide if you've tried the latest revision. This message will be removed once Tuya 2.0 is considered completed... Check daily as there is a lot of work happening on this topic ATM.
 
 This script will create a Proxmox LXC container with the latest Debian-stretch and setup tuya-convert 2.0. This process is still experimental and very tempermental. Using brute-force, connecting and disconnection during the process, I have been successful with all devices EXCEPT light-bulbs.
 This process has been confirmed working by multiple others with various levels of interaction.
