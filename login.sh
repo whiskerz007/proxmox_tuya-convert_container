@@ -5,13 +5,15 @@ trap "{ echo -e '\nTerminate'; ./stop_flash.sh; exit 1; }" SIGINT SIGTERM
 cd /root/tuya-convert/
 git fetch origin >/dev/null
 mapfile -t REF < <(git show-ref master | sed -e 's/^\(.*\)\(\s.*$\)/\1/')
-if [ "${REF[0]}" != "${REF[1]}" ]; then
-  echo -e "\n\n"\
-        "There is a \e[1mnew version\e[0m of '\e[100;93mtuya-convert\e[39;49m'. Consider running the\n"\
-        "script found at the following URL to ensure best possible outcome.\n\n"\
-        "https://github.com/SirRedZ/ProxMox-Tuya-Convert-2.0-Container\n"
-  read -n 1 -p "--Press any key to continue--"
-fi
+#if [ "${REF[0]}" != "${REF[1]}" ]; then
+#  echo -e "\n\n"\
+#        "There is a \e[1mnew version\e[0m of '\e[100;93mtuya-convert\e[39;49m'. Consider running the\n"\
+#        "script found at the following URL to ensure best possible outcome.\n\n"\
+#        "https://github.com/SirRedZ/ProxMox-Tuya-Convert-2.0-Container\n"
+#  read -n 1 -p "--Press any key to continue--"
+#fi
+echo   "Thank you for choosing this LXC Container created by Whiskerz007 & Tollbringer. Special thanks to Colin Kuebec & all contributers to the Tuya Convert Project!"
+sleep 5
 ./start_flash.sh
 echo "tuya-convert exited with code:$?"
 function menu1 (){
