@@ -15,6 +15,8 @@ bash -c "$(wget -qO - https://raw.githubusercontent.com/sirredz/ProxMox-Tuya-Con
 During the setup process, you will prompted to select a wireless interface. This interface will be assigned to container. _(Note: When the container is running, no other container or VM will have access to the interface.)_ After the successful completion of the script, start the container identified by the script, then use the login credentials shown to start the tuya-convert script. If you need to stop tuya-convert, press `CTRL + C` and it will be halted and you will be brought back to the login prompt. If you login again it will start tuya-convert again.
 
 Note: A new GUI prompt will appear about updating SMB.CONF - just select NO <Default> and press ENTER to continue the script. It will wait for a response.
+  
+<a href="https://ibb.co/bPSZ9SF"><img src="https://i.ibb.co/TkVS3V1/smb-conf.png" alt="smb-conf" border="0"></a>
 
 ## Prerequisites
 
