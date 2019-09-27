@@ -93,7 +93,7 @@ echo "Next ID is $CTID"
 # Download latest Debian LXC template
 pveam update
 mapfile -t DEBIANS < <(pveam available -section system | sed -n "s/.*\(debian.*\)/\1/p")
-DEBIAN="${DEBIANS[-1]}"
+DEBIAN="${DEBIANS[-3]}"
 pveam download local $DEBIAN ||
   die "A problem occured while downloading the LXC template."
 TEMPLATE="local:vztmpl/${DEBIAN}"
