@@ -12,7 +12,7 @@ mapfile -t REF < <(git show-ref master | sed -e 's/^\(.*\)\(\s.*$\)/\1/')
 #        "https://github.com/SirRedZ/ProxMox-Tuya-Convert-2.0-Container\n"
 #  read -n 1 -p "--Press any key to continue--"
 #fi
-echo   "Thank you for choosing this LXC Container created by Whiskerz007 & Tollbringer.\n Special thanks to Colin Kuebler & all contributers to the Tuya Convert Project!"
+echo   "Thank you for choosing this LXC Container created by Whiskerz007 & Tollbringer."\n "Special thanks to Colin Kuebler & all contributers to the Tuya Convert Project!"
 sleep 5
 ./start_flash.sh
 echo "tuya-convert exited with code:$?"
