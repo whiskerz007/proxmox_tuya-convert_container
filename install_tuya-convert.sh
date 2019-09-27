@@ -27,7 +27,7 @@ apt update
 apt upgrade -y
 apt install -y git curl net-tools samba libssl-dev
 git clone -b new-api https://github.com/kueblc/tuya-convert
-find tuya-convert -name \*.sh -exec sed -i -e "s/sudo -E//" -e "s/sudo //" {} \;
+find tuya-convert -name \*.sh -exec sed -i -e "s/sudo -E//" -e "s/sudo //" -e "s/sudo -H//" {} \;
 cd tuya-convert
 ./install_prereq.sh
 systemctl disable mosquitto
