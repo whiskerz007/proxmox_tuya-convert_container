@@ -34,10 +34,8 @@ systemctl disable mosquitto
 echo "Setting $WLAN interface for tuya-convert ..."
 sed -i "s/^\(WLAN=\)\(.*\)/\1$WLAN/" config.txt
 
-# get Digiblurs bin file WiFiman
-cd /tuya-convert/files
-wget https://raw.github.com/digiblur/Sonoff-Tasmota/development/generic/tasmota-6.6.0.7-generic-wifiman-2.3.0.bin
-mv tasmota-6.6.0.7-generic-wifiman-2.3.0.bin thirdparty.bin
+#Get Digiblurs WifiMan binary file
+wget -P /tuya-convert/files https://raw.githubusercontent.com/digiblur/Sonoff-Tasmota/development/generic/tasmota-6.6.0.7-generic-wifiman-2.3.0.bin
 
 # Customize OS
 cat <<EOL >> /etc/samba/smb.conf
