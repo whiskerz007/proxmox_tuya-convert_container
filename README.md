@@ -26,10 +26,12 @@ In order for this script to work appropriately, you must first have the wireless
 
 To add custom firmware (not supplied by tuya-convert), connect to the samba share created by the container (details are provided at the login prompt) and add the binary to the `tuya-convert/files/` folder. Your binary will listed under the custom firmware menu.
 
+### Coming Soon: 
+
 DigiblurDIY has provided the latest Tasmota BIN files with WiFiManager enabled (thirdpary.bin) - Thanks Travis!
 All you have to do is start your Tuya-Convert container, and drop the BIN file in the files folder using SAMBA bfore you start the conversion process. The script will index the folder contents for you.
 
-## It is highly recommended you flash thirdparty.bin with the WIFI Manager enabled by default. This will prevent 'bricking' the device as a result of typing the SSID or PASSWORD incorrectly, during setup.
+### It is highly recommended you flash thirdparty.bin or Digiblurs WiFi Man binary file with the WIFI Manager enabled by default. This will prevent 'bricking' the device as a result of typing the SSID or PASSWORD incorrectly, during setup.
 
 ## Sources
 
