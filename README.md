@@ -1,10 +1,12 @@
 # Proxmox Tuya-Convert v2.0 Container 
 
-### Updated Sept 27 (1:00am EST) Now Tuya 1.0 Compatible & Light Bulb compatible (so far...) 
+### Updated Sept 29. Now Tuya 1.0 Compatible & Light Bulb compatible (so far...) 
 
 #### Testing note: Many devices have been successfully flashed. Reports of success with Light-Bulbs have started to appear, and this branch has been updated accordingly. NOTE: You will wait longer (more dots) for some of these devices - this is NORMAL - be patient.  This message will be removed once Tuya 2.0 is considered completed... Check daily as there is a lot of work happening on this topic ATM.
 
-This script will create a Proxmox LXC container with the latest Debian-BUSTER and setup tuya-convert. This process is still experimental and very somewhat tempermental. 
+This script will create a Proxmox LXC container with the latest **DEBIAN-BUSTER** and setup tuya-convert. This process is still experimental and somewhat tempermental. 
+
+####ProxMox 6.x Users:
 
 To create a new LXC container in the `local-lvm` storage, run the following in a SSH session or the console from Proxmox interface
 
@@ -26,12 +28,11 @@ In order for this script to work appropriately, you must first have the wireless
 
 To add custom firmware (not supplied by tuya-convert), connect to the samba share created by the container (details are provided at the login prompt) and add the binary to the `tuya-convert/files/` folder. Your binary will listed under the custom firmware menu.
 
-### Coming Soon: 
-
-DigiblurDIY has provided the latest Tasmota BIN files with WiFiManager enabled (thirdpary.bin) - Thanks Travis!
 All you have to do is start your Tuya-Convert container, and drop the BIN file in the files folder using SAMBA bfore you start the conversion process. The script will index the folder contents for you.
 
-### It is highly recommended you flash thirdparty.bin or Digiblurs WiFi Man binary file with the WIFI Manager enabled by default. This will prevent 'bricking' the device as a result of typing the SSID or PASSWORD incorrectly, during setup.
+#### It is highly recommended you flash Digiblurs WiFi Man binary file with the WIFI Manager enabled by default. This will prevent 'bricking' the device as a result of typing the SSID or PASSWORD incorrectly, during setup.
+
+**NOTE:** If your device was easily converted using the original Tuya-Convert, but now struggles or won't convert - Please try using the ProxMox 5.x (Debian-Stretch) branch and try again. I have experienced better compatibility at this time using the old Debian 9 template to convert older devices/non-blocked tuya firmware.
 
 ## Sources
 
