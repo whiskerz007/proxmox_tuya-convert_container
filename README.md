@@ -2,7 +2,7 @@
 
 ### Updated October 4th. Now Tuya 1.0 Compatible & Light Bulb compatible. Tuya Convert has been updated and is considered working.
 
-#### If you have difficult devices, please post issues in the github issues link below or jump on discord for some help!
+#### If you have a difficult devices, please post issues in the github issues link below or jump on discord for some help!
 
 (https://github.com/ct-Open-Source/tuya-convert/issues)
 
