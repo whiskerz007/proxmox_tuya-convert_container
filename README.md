@@ -1,8 +1,8 @@
 # Proxmox Tuya-Convert v2.0 Container 
 
-### Updated Sept 29. Now Tuya 1.0 Compatible & Light Bulb compatible (so far...) 
+### Updated October 4th. Now Tuya 1.0 Compatible & Light Bulb compatible. Tuya Convert has been updated and is considered working.
 
-#### Testing note: Many devices have been successfully flashed. Reports of success with Light-Bulbs have started to appear, and this branch has been updated accordingly. NOTE: You will wait longer (more dots) for some of these devices - this is NORMAL - be patient.  This message will be removed once Tuya 2.0 is considered completed... Check daily as there is a lot of work happening on this topic ATM.
+#### If you have difficult devices, please post issues in the proper place or jump on discord for some help!
 
 This script will create a Proxmox LXC container with the latest **DEBIAN-BUSTER** and setup tuya-convert. This process is still experimental and somewhat tempermental. 
 
