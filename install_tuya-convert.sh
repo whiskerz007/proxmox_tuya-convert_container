@@ -54,4 +54,4 @@ echo -e \
   " password: tuya\n\n" >> /etc/issue
 sed -i "s/^\(root\)\(.*\)\(\/bin\/bash\)$/\1\2\/root\/login.sh/" /etc/passwd
 
-rm /root/install_tuya-convert.sh
+rm -rf /root/install_tuya-convert.sh /var/{cache,log}/* /var/lib/apt/lists/*
