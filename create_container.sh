@@ -99,15 +99,22 @@ pveam download local $DEBIAN ||
 TEMPLATE="local:vztmpl/${DEBIAN}"
 
 # Create LXC and add WLAN interface
+DISK_PREFIX="vm"
+DISK_FORMAT="raw"
 if [ "$STORAGE_TYPE" = "dir" ]; then
     DISK_EXT=".raw"
     DISK_REF="$CTID/"
+elif [ "$STORAGE_TYPE" = "zfspool" ]; then
+    DISK_PREFIX="subvol"
+    DISK_FORMAT="subvol"
 fi
-DISK=vm-${CTID}-disk-0${DISK_EXT}
+DISK=${DISK_PREFIX}-${CTID}-disk-0${DISK_EXT}
 ROOTFS=${LXC_STORAGE}:${DISK_REF}${DISK}
 DISK_PATH=`pvesm path $ROOTFS`
-pvesm alloc $LXC_STORAGE $CTID $DISK 2G
-mke2fs $DISK_PATH
+pvesm alloc $LXC_STORAGE $CTID $DISK 2G --format $DISK_FORMAT
+if [ "$STORAGE_TYPE" != "zfspool" ]; then
+    mke2fs $DISK_PATH
+fi
 pct create $CTID $TEMPLATE -arch amd64 -cores 1 -hostname tuya-convert \
     -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype debian \
     -rootfs $ROOTFS -storage $LXC_STORAGE
