@@ -36,7 +36,7 @@ which iw >/dev/null || (
 # Verify valid storage location
 LXC_STORAGE=${1:-local-lvm}
 pvesm list $LXC_STORAGE >&/dev/null ||
-  die "'$LXC_STORAGE' is not a valid storage ID.\n\n\n" 
+  die "'$LXC_STORAGE' is not a valid storage ID.\n\n\n"
 pvesm status -content images -storage $LXC_STORAGE >&/dev/null ||
   die "'$LXC_STORAGE' does not allow 'Disk image' to be stored."
 STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
@@ -90,13 +90,15 @@ EOF
 )
 echo "Next ID is $CTID"
 
-# Download latest Debian LXC template
+# Download latest LXC TEMPLATE
 pveam update
-mapfile -t DEBIANS < <(pveam available -section system | sed -n "s/.*\(debian.*\)/\1/p")
-DEBIAN="${DEBIANS[-1]}"
-pveam download local $DEBIAN ||
+OSTYPE=ubuntu
+OSVERSION=${OSTYPE}-18.04
+mapfile -t TEMPLATES < <(pveam available -section system | sed -n "s/.*\(${OSVERSION}.*\)/\1/p"  | sort -t - -k 2 -g)
+TEMPLATE="${TEMPLATES[-1]}"
+pveam download local $TEMPLATE ||
   die "A problem occured while downloading the LXC template."
-TEMPLATE="local:vztmpl/${DEBIAN}"
+TEMPLATE="local:vztmpl/${TEMPLATE}"
 
 # Create LXC and add WLAN interface
 DISK_PREFIX="vm"
@@ -116,7 +118,7 @@ if [ "$STORAGE_TYPE" != "zfspool" ]; then
     mke2fs $DISK_PATH
 fi
 pct create $CTID $TEMPLATE -arch amd64 -cores 1 -hostname tuya-convert \
-    -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype debian \
+    -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype $OSTYPE \
     -rootfs $ROOTFS -storage $LXC_STORAGE
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
 lxc.net.1.type: phys
