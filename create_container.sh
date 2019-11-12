@@ -61,19 +61,22 @@ if [ ${#WLANS_READY[@]} -eq 0 ] && $FAILED_SUPPORT; then
   die "One or more of the detected WiFi adapters do not support 'AP mode'. Try another adapter."
 elif [ ${#WLANS_READY[@]} -eq 0 ]; then
   die "Unable to identify usable WiFi adapters. If the adapter is currently attached, check your drivers."
-fi
-while true; do
-  echo -e "\n\nHere are all of your available WiFi interfaces...\n"
-  for i in "${!WLANS_READY[@]}"; do
-    echo "$i) ${WLANS_READY[$i]}"
+elif [ ${#WLANS_READY[@]} -eq 1 ]; then
+  WLAN=${WLANS_READY[0]}
+else
+  while true; do
+    echo -e "\n\nHere are all of your available WiFi interfaces...\n"
+    for i in "${!WLANS_READY[@]}"; do
+      echo "$i) ${WLANS_READY[$i]}"
+    done
+    echo
+    read -n 1 -p "Which interface would you like to use? " WLAN
+    if [[ "${WLAN}" =~ ^[0-9]+$ ]] && [ ! -z ${WLANS_READY[$WLAN]} ]; then
+      WLAN=${WLANS_READY[$WLAN]}
+      break
+    fi
   done
-  echo
-  read -n 1 -p "Which interface would you like to use? " WLAN
-  if [[ "${WLAN}" =~ ^[0-9]+$ ]] && [ ! -z ${WLANS_READY[$WLAN]} ]; then
-    WLAN=${WLANS_READY[$WLAN]}
-    break
-  fi
-done
+fi
 echo -e "\nUsing $WLAN..."
 
 # Get the next guest VM/LXC ID
