@@ -68,7 +68,7 @@ function menu2 () {
   done
 }
 menu1
-curl_cmd="curl --fail -m 2"
+curl_cmd="curl"
 case $RESPONSE in
   1)
     $curl_cmd http://10.42.42.42/undo
@@ -88,13 +88,6 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
   echo -e "\nWARNING: An error occured when trying to flash device. Dropping to shell...\n"
   /bin/bash
-else
-  if [ $RESPONSE -eq 1 ]; then
-    SLEEP=2
-  else
-    SLEEP=75
-  fi
-  echo -e "\n\nWaiting for flash to complete.\nSleeping for $SLEEP seconds...\n"
-  sleep $SLEEP
 fi
+sleep 5
 ./stop_flash.sh
