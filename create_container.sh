@@ -92,7 +92,7 @@ else
   while [ -z "${STORAGE:+x}" ]; do
     STORAGE=$(
       whiptail --title "Storage Pools" --radiolist \
-      "Which storage pool would you like to use for the container?\n\n" \
+      "Which storage pool would you like to use?\n\n" \
       15 $(($MSG_MAX_LENGTH + 23)) 6 "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3
     ) || exit
   done
