@@ -41,11 +41,11 @@ which iw >/dev/null || (
 )
 
 # Verify valid storage location
-LXC_STORAGE=${1:-local-lvm}
-pvesm list $LXC_STORAGE >&/dev/null ||
-  die "'$LXC_STORAGE' is not a valid storage ID.\n\n\n" 
-pvesm status -content images -storage $LXC_STORAGE >&/dev/null ||
-  die "'$LXC_STORAGE' does not allow 'Disk image' to be stored."
+STORAGE=${1:-local-lvm}
+pvesm list $STORAGE >&/dev/null ||
+  die "'$STORAGE' is not a valid storage ID.\n\n\n" 
+pvesm status -content images -storage $STORAGE >&/dev/null ||
+  die "'$STORAGE' does not allow 'Disk image' to be stored."
 
 # Get WLAN interfaces capable of being passed to LXC
 FAILED_SUPPORT=false
@@ -109,19 +109,22 @@ pveam download local $TEMPLATE ||
   die "A problem occured while downloading the LXC template."
 
 # Create variables for container disk
-STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
-if [ "$STORAGE_TYPE" = "dir" ]; then
+STORAGE_TYPE=$(pvesm status -storage $STORAGE | awk 'NR>1 {print $2}')
+case $STORAGE_TYPE in
+  dir|nfs)
     DISK_EXT=".raw"
     DISK_REF="$CTID/"
-elif [ "$STORAGE_TYPE" = "zfspool" ]; then
+    ;;
+  zfspool)
     DISK_PREFIX="subvol"
     DISK_FORMAT="subvol"
-fi
+    ;;
+esac
 DISK=${DISK_PREFIX:-vm}-${CTID}-disk-0${DISK_EXT-}
-ROOTFS=${LXC_STORAGE}:${DISK_REF-}${DISK}
+ROOTFS=${STORAGE}:${DISK_REF-}${DISK}
 
 # Create LXC
-pvesm alloc $LXC_STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw}
+pvesm alloc $STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw}
 if [ "$STORAGE_TYPE" != "zfspool" ]; then
   mkfs.ext4 $(pvesm path $ROOTFS)
 fi
@@ -130,7 +133,7 @@ HOSTNAME=tuya-convert
 TEMPLATE_STRING="local:vztmpl/${TEMPLATE}"
 pct create $CTID $TEMPLATE_STRING -arch $ARCH -cores 1 -hostname $HOSTNAME \
   -net0 name=eth0,bridge=vmbr0,ip=dhcp -ostype $OSTYPE \
-  -rootfs $ROOTFS -storage $LXC_STORAGE
+  -rootfs $ROOTFS -storage $STORAGE
 
 # Pass network interface to LXC
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
