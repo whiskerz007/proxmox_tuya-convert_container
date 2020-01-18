@@ -123,7 +123,7 @@ ROOTFS=${LXC_STORAGE}:${DISK_REF-}${DISK}
 # Create LXC
 pvesm alloc $LXC_STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw}
 if [ "$STORAGE_TYPE" != "zfspool" ]; then
-  mke2fs $(pvesm path $ROOTFS)
+  mkfs.ext4 $(pvesm path $ROOTFS)
 fi
 ARCH=$(dpkg --print-architecture)
 HOSTNAME=tuya-convert
