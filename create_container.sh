@@ -80,17 +80,7 @@ fi
 echo -e "\nUsing $WLAN..."
 
 # Get the next guest VM/LXC ID
-CTID=$(cat<<EOF | python3
-import json
-with open('/etc/pve/.vmlist') as vmlist:
-    vmids = json.load(vmlist)
-if 'ids' not in vmids:
-    print(100)
-else:
-    last_vm = sorted(vmids['ids'].keys())[-1:][0]
-    print(int(last_vm)+1)
-EOF
-)
+CTID=$(pvesh get /cluster/nextid)
 echo "Next ID is $CTID"
 
 # Download latest Debian LXC template
