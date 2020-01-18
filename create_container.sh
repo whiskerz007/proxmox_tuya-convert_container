@@ -11,16 +11,26 @@ trap die ERR
 trap cleanup EXIT
 
 function error_exit() {
-  REASON=$1
-  MSG="\e[91mERROR: \e[93m$EXIT@"
-  if [ -z "$REASON" ]; then
-    MSG="$MSG$LINE:"
-    REASON="A failure has occured."
-  else
-    MSG="$MSG`echo $(( $LINE - 1 ))`:"
-  fi
-  echo -e "$MSG \e[97m$REASON\e[39m\e[49m"
+  trap - ERR
+  local DEFAULT='Unknown failure occured.'
+  local REASON="\e[97m${1:-$DEFAULT}\e[39m"
+  local FLAG="\e[91m[ERROR] \e[93m$EXIT@$LINE"
+  msg "$FLAG $REASON"
   exit $EXIT
+}
+function warn() {
+  local REASON="\e[97m$1\e[39m"
+  local FLAG="\e[93m[WARNING]\e[39m"
+  msg "$FLAG $REASON"
+}
+function info() {
+  local REASON="$1"
+  local FLAG="\e[36m[INFO]\e[39m"
+  msg "$FLAG $REASON"
+}
+function msg() {
+  local TEXT="$1"
+  echo -e "$TEXT"
 }
 function cleanup() {
   popd >/dev/null
@@ -38,8 +48,8 @@ wget -qL ${URL}/{install_tuya-convert,login}.sh
 
 # Check for dependencies
 which iw >/dev/null || (
-  apt update
-  apt install -y iw ||
+  apt-get update >/dev/null
+  apt-get -qqy install iw &>/dev/null ||
     die "Unable to install prerequisites."
 )
 
@@ -49,6 +59,7 @@ pvesm list $STORAGE >&/dev/null ||
   die "'$STORAGE' is not a valid storage ID.\n\n\n" 
 pvesm status -content images -storage $STORAGE >&/dev/null ||
   die "'$STORAGE' does not allow 'Disk image' to be stored."
+info "Using '$STORAGE' for storage location."
 
 # Get WLAN interfaces capable of being passed to LXC
 FAILED_SUPPORT=false
@@ -92,14 +103,16 @@ else
     fi
   done
 fi
-echo -e "\nUsing $WLAN..."
+info "Using '$WLAN' wireless interface."
 
 # Get the next guest VM/LXC ID
 CTID=$(pvesh get /cluster/nextid)
-echo "Next ID is $CTID"
+info "Container ID is $CTID."
 
 # Download latest Debian LXC template
-pveam update
+msg "Updating LXC template list..."
+pveam update >/dev/null
+msg "Downloading LXC template..."
 OSTYPE=debian
 OSVERSION=${OSTYPE}-10
 mapfile -t TEMPLATES < <(
@@ -108,7 +121,7 @@ mapfile -t TEMPLATES < <(
   sort -t - -k 2 -V
 )
 TEMPLATE="${TEMPLATES[-1]}"
-pveam download local $TEMPLATE ||
+pveam download local $TEMPLATE >/dev/null ||
   die "A problem occured while downloading the LXC template."
 
 # Create variables for container disk
@@ -127,16 +140,17 @@ DISK=${DISK_PREFIX:-vm}-${CTID}-disk-0${DISK_EXT-}
 ROOTFS=${STORAGE}:${DISK_REF-}${DISK}
 
 # Create LXC
-pvesm alloc $STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw}
+msg "Creating LXC container..."
+pvesm alloc $STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw} >/dev/null
 if [ "$STORAGE_TYPE" != "zfspool" ]; then
-  mkfs.ext4 $(pvesm path $ROOTFS)
+  mkfs.ext4 $(pvesm path $ROOTFS) &>/dev/null
 fi
 ARCH=$(dpkg --print-architecture)
 HOSTNAME=tuya-convert
 TEMPLATE_STRING="local:vztmpl/${TEMPLATE}"
 pct create $CTID $TEMPLATE_STRING -arch $ARCH -cores 1 -hostname $HOSTNAME \
   -net0 name=eth0,bridge=vmbr0,ip=dhcp -ostype $OSTYPE \
-  -rootfs $ROOTFS -storage $STORAGE
+  -rootfs $ROOTFS -storage $STORAGE >/dev/null
 
 # Pass network interface to LXC
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
@@ -147,14 +161,11 @@ lxc.net.1.flags: up
 EOF
 
 # Setup container for tuya-convert
+msg "Starting LXC container..."
 pct start $CTID
 pct push $CTID install_tuya-convert.sh /root/install_tuya-convert.sh -perms 755
 pct push $CTID login.sh /root/login.sh -perms 755
 pct exec $CTID /root/install_tuya-convert.sh $WLAN
 pct stop $CTID
 
-echo -e "\n\n\n" \
-    "******************************\n" \
-    "* Successfully Create New CT *\n" \
-    "*        CT ID is $CTID        *\n" \
-    "******************************\n\n"
+info "Successfully created tuya-convert LXC to $CTID."
