@@ -1,12 +1,12 @@
 # New Proxmox tuya-convert Container
 
-This script will create a new Proxmox LXC container with the latest Debian and setup tuya-convert. To create a new LXC container in the `local-lvm` storage, run the following in a SSH session or the console from Proxmox interface
+This script will create a new Proxmox LXC container with the latest Debian and setup tuya-convert. To create a new LXC container, run the following in a SSH session or the console from Proxmox interface
 
 ```
-bash -c "$(wget -qLO - https://github.com/whiskerz007/proxmox_tuya-convert_container/raw/master/create_container.sh)" -s local-lvm
+bash -c "$(wget -qLO - https://github.com/whiskerz007/proxmox_tuya-convert_container/raw/master/create_container.sh)"
 ```
 
-During the setup process, you may be prompted to select a wireless interface (if you have more than one usable interface). This interface will be assigned to container. _(Note: When the container is running, no other container or VM will have access to the interface.)_ After the successful completion of the script, start the container identified by the script, then use the login credentials shown to start the tuya-convert script. If you need to stop tuya-convert, press `CTRL + C` and it will be halted and you will be brought back to the login prompt. If you login again it will start tuya-convert again.
+During the setup process, you may be prompted to select your storage location or wireless interface (if you have more than one usable option). The wireless interface will be assigned to container. _(Note: When the container is running, no other container or VM will have access to the interface.)_ After the successful completion of the script, start the container identified by the script, then use the login credentials shown to start the tuya-convert script. If you need to stop tuya-convert, press `CTRL + C`, tuya-convert will be halted, and you will be brought back to the login prompt. If you login again it will start tuya-convert again.
 
 ## Prerequisite
 

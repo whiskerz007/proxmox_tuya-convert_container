@@ -67,12 +67,36 @@ which iw >/dev/null || (
     die "Unable to install prerequisites."
 )
 
-# Verify valid storage location
-STORAGE=${1:-local-lvm}
-pvesm list $STORAGE >&/dev/null ||
-  die "'$STORAGE' is not a valid storage ID.\n\n\n" 
-pvesm status -content images -storage $STORAGE >&/dev/null ||
-  die "'$STORAGE' does not allow 'Disk image' to be stored."
+# Generate graphical menu for storage location
+while read -r line; do
+  TAG=$(echo $line | awk '{print $1}')
+  TYPE=$(echo $line | awk '{printf "%-10s", $2}')
+  FREE=$(
+    echo $line | \
+    numfmt --field 4-6 --from-unit=K --to=iec --format %.2f | \
+    awk '{printf( "%9sB", $6)}'
+  )
+  ITEM="  Type: $TYPE Free: $FREE "
+  OFFSET=2
+  if [[ $((${#ITEM} + $OFFSET)) -gt ${MSG_MAX_LENGTH:-} ]]; then
+    MSG_MAX_LENGTH=$((${#ITEM} + $OFFSET))
+  fi
+  STORAGE_MENU+=( "$TAG" "$ITEM" "OFF" )
+done < <(pvesm status -content rootdir | awk 'NR>1')
+if [ $((${#STORAGE_MENU[@]}/3)) -eq 0 ]; then
+  warn "'Container' needs to be selected for at least one storage location."
+  die "Unable to detect valid storage location."
+elif [ $((${#STORAGE_MENU[@]}/3)) -eq 1 ]; then
+  STORAGE=${STORAGE_MENU[0]}
+else
+  while [ -z "${STORAGE:+x}" ]; do
+    STORAGE=$(
+      whiptail --title "Storage Pools" --radiolist \
+      "Which storage pool would you like to use for the container?\n\n" \
+      15 $(($MSG_MAX_LENGTH + 23)) 6 "${STORAGE_MENU[@]}" 3>&1 1>&2 2>&3
+    ) || exit
+  done
+fi
 info "Using '$STORAGE' for storage location."
 
 # Get WLAN interfaces capable of being passed to LXC
