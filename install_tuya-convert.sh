@@ -28,8 +28,7 @@ function msg() {
 }
 
 # Default variables
-WLAN=$1
-LOCALE=${2:-en_US.UTF-8}
+LOCALE=${1:-en_US.UTF-8}
 
 # Prepare container OS
 msg "Customizing container OS..."
@@ -63,7 +62,10 @@ apt-get -qqy install \
 # Clone tuya-convert
 msg "Cloning tuya-convert..."
 git clone --quiet https://github.com/ct-Open-Source/tuya-convert
-find tuya-convert -name \*.sh -exec sed -i -e "s/sudo \(-\S\+ \)*//" {} \;
+
+# Configure tuya-convert
+msg "Configuring tuya-convert..."
+./configure_tuya-convert.sh
 
 # Install tuya-convert
 msg "Running tuya-convert/install_prereq.sh..."
@@ -71,8 +73,6 @@ cd tuya-convert
 ./install_prereq.sh &>/dev/null
 systemctl disable dnsmasq &>/dev/null
 systemctl disable mosquitto &>/dev/null
-echo "Setting $WLAN interface for tuya-convert ..."
-sed -i "s/^\(WLAN=\)\(.*\)/\1$WLAN/" config.txt
 
 # Customize OS
 msg "Customizing OS..."
