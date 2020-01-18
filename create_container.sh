@@ -121,24 +121,29 @@ for i in $(seq 0 2 $((${#WLANS[@]}-1)));do
     FAILED_SUPPORT=true
   fi
 done
-if [ ${#WLANS_READY[@]} -eq 0 ] && $FAILED_SUPPORT; then
+if [ -z ${WLANS_READY+x} ] && $FAILED_SUPPORT; then
   die "One or more of the detected WiFi adapters do not support 'AP mode'. Try another adapter."
-elif [ ${#WLANS_READY[@]} -eq 0 ]; then
+elif [ -z ${WLANS_READY+x} ]; then
   die "Unable to identify usable WiFi adapters. If the adapter is currently attached, check your drivers."
 elif [ ${#WLANS_READY[@]} -eq 1 ]; then
   WLAN=${WLANS_READY[0]}
 else
-  while true; do
-    echo -e "\n\nHere are all of your available WiFi interfaces...\n"
-    for i in "${!WLANS_READY[@]}"; do
-      echo "$i) ${WLANS_READY[$i]}"
-    done
-    echo
-    read -n 1 -p "Which interface would you like to use? " WLAN
-    if [[ "${WLAN}" =~ ^[0-9]+$ ]] && [ ! -z ${WLANS_READY[$WLAN]} ]; then
-      WLAN=${WLANS_READY[$WLAN]}
-      break
+  for interface in "${WLANS_READY[@]}"; do
+    CMD="udevadm info --query=property /sys/class/net/$interface"
+    MAKE=$($CMD | sed -n -e 's/ID_VENDOR_FROM_DATABASE=//p')
+    MODEL=$($CMD | sed -n -e 's/ID_MODEL_FROM_DATABASE=//p')
+    OFFSET=2
+    if [[ $((${#MAKE} + ${#MODEL} + $OFFSET)) -gt ${MSG_MAX_LENGTH:-} ]]; then
+      MSG_MAX_LENGTH=$((${#MAKE} + ${#MODEL} + $OFFSET))
     fi
+    WLAN_MENU+=( $interface "$MAKE $MODEL " "off")
+  done
+  while [ -z "${WLAN:+x}" ]; do
+    WLAN=$(
+      whiptail --title "WLAN Interfaces" --radiolist --notags \
+      "Which WLAN interface would you like to use for the container?\n\n" \
+      15 $(($MSG_MAX_LENGTH + 14)) 6 "${WLAN_MENU[@]}" 3>&1 1>&2 2>&3
+    ) || exit
   done
 fi
 info "Using '$WLAN' wireless interface."
