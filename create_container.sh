@@ -16,6 +16,7 @@ function error_exit() {
   local REASON="\e[97m${1:-$DEFAULT}\e[39m"
   local FLAG="\e[91m[ERROR] \e[93m$EXIT@$LINE"
   msg "$FLAG $REASON"
+  [ ! -z ${CTID-} ] && cleanup_failed
   exit $EXIT
 }
 function warn() {
@@ -31,6 +32,19 @@ function info() {
 function msg() {
   local TEXT="$1"
   echo -e "$TEXT"
+}
+function cleanup_failed() {
+  if [ ! -z ${MOUNT+x} ]; then
+    pct unmount $CTID
+  fi
+  if $(pct status $CTID &>/dev/null); then
+    if [ "$(pct status $CTID | awk '{print $2}')" == "running" ]; then
+      pct stop $CTID
+    fi
+    pct destroy $CTID
+  elif [ "$(pvesm list $STORAGE --vmid $CTID)" != "" ]; then
+    pvesm free $ROOTFS
+  fi
 }
 function cleanup() {
   popd >/dev/null
@@ -159,6 +173,11 @@ lxc.net.1.name: ${WLAN}
 lxc.net.1.link: ${WLAN}
 lxc.net.1.flags: up
 EOF
+
+# Set container timezone to match host
+MOUNT=$(pct mount $CTID | cut -d"'" -f 2)
+ln -fs $(readlink /etc/localtime) ${MOUNT}/etc/localtime
+pct unmount $CTID && unset MOUNT
 
 # Setup container for tuya-convert
 msg "Starting LXC container..."
