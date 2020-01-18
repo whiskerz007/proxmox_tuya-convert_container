@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 # Setup script
+set -o errexit  #Exit immediately if a pipeline returns a non-zero status
+set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
+set -o nounset  #Treat unset variables as an error
+set -o pipefail #Pipe will exit with last non-zero status if applicable
 trap "{ echo -e '\nTerminate'; exit 1; }" SIGINT SIGTERM
 
 cd /root/tuya-convert/

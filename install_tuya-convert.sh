@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 # Setup script
+set -o errexit  #Exit immediately if a pipeline returns a non-zero status
+set -o errtrace #Trap ERR from shell functions, command substitutions, and commands from subshell
+set -o nounset  #Treat unset variables as an error
+set -o pipefail #Pipe will exit with last non-zero status if applicable
 trap '{ exit $?; }' ERR
 
 # Default variables
@@ -16,7 +20,7 @@ cd /root
 
 # Detect DHCP address
 while [ "$(hostname -I)" = "" ]; do
-  COUNT=$(($COUNT + 1))
+  COUNT=$((${COUNT-} + 1))
   echo "   *-> Failed to grab an IP address, waiting...$COUNT"
   if [ $COUNT -eq 10 ]; then
     echo "ERROR: Unable to verify assigned IP address."
