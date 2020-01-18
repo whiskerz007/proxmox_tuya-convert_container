@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Setup script
 set -o pipefail
 shopt -s expand_aliases
 alias die='EXIT=$? LINE=$LINENO error_exit'
 trap die ERR
+trap cleanup EXIT
+
 function error_exit() {
   REASON=$1
   MSG="\e[91mERROR: \e[93m$EXIT@"
@@ -19,12 +21,17 @@ function error_exit() {
 }
 function cleanup() {
   popd >/dev/null
-  rm -rf $TMP
+  rm -rf $TEMP_DIR
 }
-trap cleanup EXIT
-TMP=`mktemp -d`
-pushd $TMP >/dev/null
-wget -q https://raw.githubusercontent.com/whiskerz007/proxmox_tuya-convert_container/master/{install_tuya-convert,login}.sh
+TEMP_DIR=$(mktemp -d)
+pushd $TEMP_DIR >/dev/null
+
+# Download setup and login script
+GITHUB=https://github.com/
+GITHUB_REPO=whiskerz007/proxmox_tuya-convert_container
+GITHUB_REPO_BRANCH=master
+URL=${GITHUB}${GITHUB_REPO}/raw/${GITHUB_REPO_BRANCH}
+wget -qL ${URL}/{install_tuya-convert,login}.sh
 
 # Check for dependencies
 which iw >/dev/null || (
@@ -39,13 +46,18 @@ pvesm list $LXC_STORAGE >&/dev/null ||
   die "'$LXC_STORAGE' is not a valid storage ID.\n\n\n" 
 pvesm status -content images -storage $LXC_STORAGE >&/dev/null ||
   die "'$LXC_STORAGE' does not allow 'Disk image' to be stored."
-STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
 
 # Get WLAN interfaces capable of being passed to LXC
 FAILED_SUPPORT=false
-mapfile -t WLANS < <(iw dev | sed -n 's/phy#\([0-9]\)*/\1/p; s/[[:space:]]Interface \(.*\)/\1/p')
+mapfile -t WLANS < <(
+  iw dev | \
+  sed -n 's/phy#\([0-9]\)*/\1/p; s/[[:space:]]Interface \(.*\)/\1/p'
+)
 for i in $(seq 0 2 $((${#WLANS[@]}-1)));do
-  FEATURES=( $(iw phy${WLANS[i]} info | sed -n '/\bSupported interface modes:/,/\bBand/{/Supported/d;/Band/d;s/\( \)*\* //;p;}') )
+  FEATURES=( $(
+    iw phy${WLANS[i]} info | \
+    sed -n '/\bSupported interface modes:/,/\bBand/{/Supported/d;/Band/d;s/\( \)*\* //;p;}'
+  ) )
   SUPPORTED=false
   for feature in "${FEATURES[@]}"; do
     if [ "AP" == $feature ]; then
@@ -87,15 +99,17 @@ echo "Next ID is $CTID"
 pveam update
 OSTYPE=debian
 OSVERSION=${OSTYPE}-10
-mapfile -t TEMPLATES < <(pveam available -section system | sed -n "s/.*\($OSVERSION.*\)/\1/p" | sort -t - -k 2 -V)
+mapfile -t TEMPLATES < <(
+  pveam available -section system | \
+  sed -n "s/.*\($OSVERSION.*\)/\1/p" | \
+  sort -t - -k 2 -V
+)
 TEMPLATE="${TEMPLATES[-1]}"
 pveam download local $TEMPLATE ||
   die "A problem occured while downloading the LXC template."
-TEMPLATE_STRING="local:vztmpl/${TEMPLATE}"
 
-# Create LXC and add WLAN interface
-DISK_PREFIX="vm"
-DISK_FORMAT="raw"
+# Create variables for container disk
+STORAGE_TYPE=`pvesm status -storage $LXC_STORAGE | awk 'NR>1 {print $2}'`
 if [ "$STORAGE_TYPE" = "dir" ]; then
     DISK_EXT=".raw"
     DISK_REF="$CTID/"
@@ -103,16 +117,22 @@ elif [ "$STORAGE_TYPE" = "zfspool" ]; then
     DISK_PREFIX="subvol"
     DISK_FORMAT="subvol"
 fi
-DISK=${DISK_PREFIX}-${CTID}-disk-0${DISK_EXT}
-ROOTFS=${LXC_STORAGE}:${DISK_REF}${DISK}
-DISK_PATH=`pvesm path $ROOTFS`
-pvesm alloc $LXC_STORAGE $CTID $DISK 2G --format $DISK_FORMAT
+DISK=${DISK_PREFIX:-vm}-${CTID}-disk-0${DISK_EXT-}
+ROOTFS=${LXC_STORAGE}:${DISK_REF-}${DISK}
+
+# Create LXC
+pvesm alloc $LXC_STORAGE $CTID $DISK 2G --format ${DISK_FORMAT:-raw}
 if [ "$STORAGE_TYPE" != "zfspool" ]; then
-    mke2fs $DISK_PATH
+  mke2fs $(pvesm path $ROOTFS)
 fi
-pct create $CTID $TEMPLATE_STRING -arch amd64 -cores 1 -hostname tuya-convert \
-    -net0 name=eth0,bridge=vmbr0,ip=dhcp,type=veth -ostype $OSTYPE \
-    -rootfs $ROOTFS -storage $LXC_STORAGE
+ARCH=$(dpkg --print-architecture)
+HOSTNAME=tuya-convert
+TEMPLATE_STRING="local:vztmpl/${TEMPLATE}"
+pct create $CTID $TEMPLATE_STRING -arch $ARCH -cores 1 -hostname $HOSTNAME \
+  -net0 name=eth0,bridge=vmbr0,ip=dhcp -ostype $OSTYPE \
+  -rootfs $ROOTFS -storage $LXC_STORAGE
+
+# Pass network interface to LXC
 cat <<EOF >> /etc/pve/lxc/${CTID}.conf
 lxc.net.1.type: phys
 lxc.net.1.name: ${WLAN}
@@ -124,7 +144,7 @@ EOF
 pct start $CTID
 pct push $CTID install_tuya-convert.sh /root/install_tuya-convert.sh -perms 755
 pct push $CTID login.sh /root/login.sh -perms 755
-pct exec $CTID -- bash -c "cd /root; ./install_tuya-convert.sh $WLAN"
+pct exec $CTID /root/install_tuya-convert.sh $WLAN
 pct stop $CTID
 
 echo -e "\n\n\n" \

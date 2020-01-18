@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+# Setup script
 trap "{ echo -e '\nTerminate'; exit 1; }" SIGINT SIGTERM
 
 cd /root/tuya-convert/
